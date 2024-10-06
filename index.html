@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="manifest.json">
+  <title>Document</title>
+  <style>
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-size: cover;
+    }
+    
+    /* Loading Screen */
+    #loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #fff;
+      position: fixed;
+      width: 100%;
+      z-index: 9999;
+    }
+    
+    .loading-content {
+      text-align: center;
+    }
+    
+    .logo {
+      width: 150px;
+      animation: fadein 2s ease-in-out;
+    }
+    
+    .copyright {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <button id="installButton" style="display:none;">Install App</button>
+    <div id="loading">
+      <div class="loading-content">
+        <img src="yt.jpeg" alt="Logo" class="logo">
+        <p class="copyright">&copy; 2024 Wijaya. All Rights Reserved.</p>
+      </div>
+    </div>
+
+    <div class="video-background">
+      <video id="backgroundVideo" playsinline>
+        <source src="bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+    <script>
+      // Event saat halaman sudah selesai dimuat
+      window.addEventListener('load', function() {
+        const loadingScreen = document.getElementById('loading');
+        const video = document.getElementById('backgroundVideo');
+
+        // Set timeout untuk simulasi loading
+        setTimeout(function() {
+          loadingScreen.style.display = 'none';  // Hilangkan loading screen
+          video.play();  // Mainkan video setelah loading selesai
+        }, 3000); // Sesuaikan durasi loading sesuai kebutuhan
+      });
+      
+      // Mendaftarkan Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(function() {
+        console.log('Service Worker Registered');
+      });
+    }
+
+    let deferredPrompt;
+    
+    // Memunculkan event beforeinstallprompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Mencegah prompt muncul secara otomatis
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installButton').style.display = 'block'; // Tampilkan tombol install
+    });
+
+    // Ketika tombol install ditekan
+    document.getElementById('installButton').addEventListener('click', (e) => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        deferredPrompt = null;
+      });
+    });
+    </script>
+</body>
+</html>
